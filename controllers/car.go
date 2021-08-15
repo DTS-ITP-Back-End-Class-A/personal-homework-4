@@ -39,10 +39,14 @@ func CreateNewCar(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"success": true,
 		"status":  "OK",
-		"data":    Cars,
+		"data":    body,
 	})
 }
 
-func GetAllCarsc(*fiber.Ctx) error {
-	return nil
+func GetAllCarsc(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"success": true,
+		"status":  "OK",
+		"data":    Cars,
+	})
 }
