@@ -7,4 +7,5 @@ import (
 
 func GeneralRoutes(route fiber.Router) {
 	route.Get("/health", controllers.HealthCheck)
+	route.Get("/", controllers.HelloWorld)
 }
