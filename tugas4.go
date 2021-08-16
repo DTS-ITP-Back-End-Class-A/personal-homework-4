@@ -33,7 +33,7 @@ func main() {
 		ContextPassword: "_pass",
 	}))
 
-	//GetAll,GetById,Post
+	//GetAll,Post
 	app.Get("/cars", GetCars)
 	app.Post("/create", CreateCar)
 	app.Listen(":8081")
