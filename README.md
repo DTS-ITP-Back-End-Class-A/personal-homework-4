@@ -9,7 +9,7 @@ The goal of these exercises are to practive your proficiency in web frameworks [
 4. type `go get -u github.com/gofiber/fiber/v2`
 5. copy template code in [Quickstart]
 6. type `go run main.go`
-7. Hit the Server to test Health `curl localhost:3000/` , expect a string `Hello, World 👋!` and `200` response
+7. Hit the Server to test Health `curl localhost:8081/` ,  and `200` response
 8. let's Rock !! 🚀
 
 ### Tasks 
@@ -20,11 +20,11 @@ We define routes for handling create and read operations:
 | POST          | /create-car           | Add new cars                                        |
 | GET           | /get-car              | Get all cars                                        |
 
-Access API via ```http://localhost:3000/{route}```
+Access API via ```http://localhost:8081/{route}```
 
 ### Test The APIs
 
-1. POST ```/create-car```
+1. POST ```/create```
 
 Request Body: 
 ` choose type raw json `
@@ -50,7 +50,7 @@ set status code : 200
 }
 ```
 
-2. GET ```/get-car```
+2. GET ```/cars```
 
 Authorization: ```Basic Auth```
 
@@ -75,7 +75,7 @@ if true (data hardcode):
 ```
 
 #### Challenge
-1.  POST ```/create-car```
+1.  POST ```/create```
 
 store data in memory:
 ```
@@ -101,7 +101,7 @@ return
 status code success 200
 ```
 
-2. Get ```/create-car```
+1. Get ```/cars```
 
 get data from memory:
 ```
