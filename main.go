@@ -1,128 +1,67 @@
 package main
 
 import (
-	"log"
-	"time"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 )
 
-type Produk struct{
-	NamaProduk string `json:"nama_produk"`
-	JenisProduk string `json:"jenis_produk"`
-	HargaProduk string `json:"nama_produk"`
-	TempatPembelian string `json:"tempat_pembelian"`
-	NomorBarcode string `json:"nomor_barcode"`
-	TanggalPembelian string `json:"tanggal_pembelian"`
+type Car struct {
+	CarName  string `json:"car_name"`
+	CarColor string `json:"car_color"`
+	CarType  string `json:"car_type"`
 }
 
-var signingKey = []byte("rakamin")
+func main() {
+	app := fiber.New()
 
-type UserRequest struct {
-	User     string `json:"user"`
-	Password string `json:"password"`
-}
+	//  pake basic auth
+	app.Use(basicauth.New(basicauth.Config{
+		Users: map[string]string{
+			"zazhil": "zzzzzz",
+			"admin": "12345",
+		},
+		Realm: "Forbidden",
+		Authorizer: func(user, pass string) bool {
+			if user == "zazhil" && pass == "zzzzzz" {
+				return true
+			}
+			if user == "admin" && pass == "12345" {
+				return true
+			}
+			return false
+		},
+		Unauthorized: func(c *fiber.Ctx) error {
+			return c.Status(401).JSON(&fiber.Map{
+				"message": "username / password is incorrect",
+			})
+		},
+		ContextUsername: "_user",
+		ContextPassword: "_pass",
+	}))
 
-// var produk = []Produk{
-// 	{
-// 		namaProduk: "mie goreng",
-// 		jenisProduk: "makanan",
-// 		hargaProduk: "2500",
-// 		tempatPembelian: "indomaret",
-// 		nomorBarcode: "09709735s",
-// 		tanggalPembelian: "17 Agustus",
-// 	},
-// 	{
-// 		namaProduk: "fanta",
-// 		jenisProduk: "minuman",
-// 		hargaProduk: "2050",
-// 		tempatPembelian: "alfamaret",
-// 		nomorBarcode: "025246735s",
-// 		tanggalPembelian: "17 Agustus",
-// 	},
-// 	{
-// 		namaProduk: "lefbouy",
-// 		jenisProduk: "sabun",
-// 		hargaProduk: "1450",
-// 		tempatPembelian: "alfamaret",
-// 		nomorBarcode: "02524373775",
-// 		tanggalPembelian: "17 Agustus",
-// 	},
+	car := Car{
+		CarName:  "Toyota",
+		CarColor: "Black",
+		CarType:  "Manual",
+	}
 
-// }
-
-func main()  {
-	
-    app := fiber.New()
-
-    app.Get("/get-product", func(c *fiber.Ctx) error {
-		var produk = []Produk{
-			{
-				NamaProduk: "mie goreng",
-				JenisProduk: "makanan",
-				HargaProduk: "2500",
-				TempatPembelian: "indomaret",
-				NomorBarcode: "09709735s",
-				TanggalPembelian: "17 Agustus",
-			},
-			{
-				NamaProduk: "fanta",
-				JenisProduk: "minuman",
-				HargaProduk: "2050",
-				TempatPembelian: "alfamaret",
-				NomorBarcode: "025246735s",
-				TanggalPembelian: "17 Agustus",
-			},
-			{
-				NamaProduk: "lefbouy",
-				JenisProduk: "sabun",
-				HargaProduk: "1450",
-				TempatPembelian: "alfamaret",
-				NomorBarcode: "02524373775",
-				TanggalPembelian: "17 Agustus",
-			},
-		}
-
-		return c.Status(fiber.StatusCreated).JSON(fiber.Map{ 
-			"message": "success", 
-			"status": "OK", 
-			"data": produk,
+	// routing 1 get-car
+	app.Get("/get-car", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"message": "success",
+            "status": "ok",
+            "data" : car,
 		})
 	})
-		
 
-	apiGroup := app.Group("/api")
-	apiGroup.Post("/login", func(c *fiber.Ctx) (err error) {
-		var req UserRequest
-		err = c.BodyParser(&req)
-		if err != nil {
-			log.Printf("Error in parsing the JSON request: %v.", err)
-			return
-		}
+	// routing 2 create-car
+	app.Post("/create-car", func(c *fiber.Ctx) error {
+		return c.Status(200).JSON(fiber.Map{
+			"message": "success",
+			"status": "ok",
+			"data": car,
+		})
+	})
 
-		if req.User != "admin" || req.Password != "4dm1n" {
-			err = c.SendStatus(fiber.StatusUnauthorized)
-			return
-		}
-
-		signJwt := jwt.New(jwt.SigningMethodHS256)
-
-		claims := signJwt.Claims.(jwt.MapClaims)
-		claims["name"] = "Admin"
-		claims["admin"] = true
-		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-		signJwt.Claims = claims
-
-		token, err := signJwt.SignedString(signingKey)
-		if err != nil {
-			err = c.SendStatus(fiber.StatusInternalServerError)
-			return
-		}
-
-		err = c.JSON(fiber.Map{"token": token})
-		return
-    })
-
-    app.Listen(":3000")
+	app.Listen(":3000")
 }
